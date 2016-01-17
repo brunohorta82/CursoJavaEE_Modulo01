@@ -17,6 +17,8 @@ public class ShoppingListItem {
      * ENCAPSULAMENTO (GETTERS AND SETTERS)
      */
 
+    private long id;
+
     private String description;
     private  int quantity;
 
@@ -26,6 +28,14 @@ public class ShoppingListItem {
     public ShoppingListItem(String description, int quantity) {
         this.description = description;
         this.quantity = quantity;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -42,5 +52,14 @@ public class ShoppingListItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "ShoppingListItem{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", quantity=" + quantity +
+                '}';
     }
 }
