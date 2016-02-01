@@ -2,6 +2,11 @@ package pt.cursojavaee.business.bondary;
 
 import pt.cursojavaee.business.entity.ShoppingListItem;
 
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -13,8 +18,12 @@ import java.util.List;
 /**
  * Created by brunohorta on 10/01/16.
  */
+@Stateless
 @Path("shoppinglists")
 public class ShoppingItemResource {
+
+    @Inject
+    private ShoppingListItemManager shoppingListItemManager;
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -23,7 +32,6 @@ public class ShoppingItemResource {
         shoppingListItems.add(new ShoppingListItem("Cafe", 100));
         shoppingListItems.add(new ShoppingListItem("Pizza", 50));
         return shoppingListItems;
-
     }
 
     /**
@@ -36,16 +44,13 @@ public class ShoppingItemResource {
     @GET
     @Path("{id}")
     public ShoppingListItem find(@PathParam("id") long id) {
-        ShoppingListItem bolachas = new ShoppingListItem("BOLACHAS", 20);
-        bolachas.setId(100);
-        return bolachas;
+        return shoppingListItemManager.get(id);
     }
 
     @POST
     @Consumes("application/json")
     public Response save(ShoppingListItem shoppingListItem, @Context UriInfo uriInfo) {
-        shoppingListItem.setId(1);
-        System.out.println("SAVED " + shoppingListItem);
+        shoppingListItem = shoppingListItemManager.save(shoppingListItem);
         URI uri = uriInfo.getAbsolutePathBuilder().path("/" + shoppingListItem.getId()).build();
         return Response.created(uri).entity(shoppingListItem).build();
     }
@@ -54,15 +59,18 @@ public class ShoppingItemResource {
     @Path("{id}")
     public ShoppingListItem update(@PathParam("id") long id, ShoppingListItem shoppingListItem) {
         shoppingListItem.setId(id);
-        System.out.println("UPDATED " + shoppingListItem);
-        return shoppingListItem;
+        return shoppingListItemManager.save(shoppingListItem);
     }
 
     @DELETE
     @Path("{id}")
     public Response delete(@PathParam("id") long id) {
-        System.out.println("DELETED OBJECT WITH ID " + id);
-        return Response.ok().build();
+        try {
+            shoppingListItemManager.remove(id);
+            return Response.ok().header("status", "deleted").build();
+        } catch (ShoppingItemNotFoundException e) {
+           return Response.status(Response.Status.NO_CONTENT).header("reason", e.getMessage()).build();
+        }
     }
 
 }

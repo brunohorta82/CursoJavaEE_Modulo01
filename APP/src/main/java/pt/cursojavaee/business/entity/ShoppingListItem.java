@@ -1,26 +1,33 @@
 package pt.cursojavaee.business.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * Created by brunohorta on 10/01/16.
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ShoppingListItem {
+@Entity
+public class ShoppingListItem implements Serializable {
 
     /**
      * ATRIBUTOS
      * CONSTRUTORES
      * ENCAPSULAMENTO (GETTERS AND SETTERS)
      */
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
     private String description;
-    private  int quantity;
+    private int quantity;
 
     protected ShoppingListItem() {
     }

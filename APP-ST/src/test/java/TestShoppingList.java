@@ -46,7 +46,7 @@ public class TestShoppingList {
 
     @Test
     public void testFindById() {
-        WebTarget target = provider.target().path("shoppinglists/100");
+        WebTarget target = provider.target().path("shoppinglists/1");
         assertNotNull(target);
 
         Response response = target.request(MediaType.APPLICATION_JSON).get();
@@ -57,8 +57,9 @@ public class TestShoppingList {
 
         assertNotNull(payload);
 
-        assertThat(payload.getJsonNumber("id").longValue(), is(100L));
-        assertThat(payload.getString("description"), is("BOLACHAS"));
+        assertThat(payload.getJsonNumber("id").longValue(), is(1L));
+        assertThat(payload.getString("description"), is("chocolate branco"));
+        assertThat(payload.getInt("quantity"), is(11));
 
 
     }
@@ -109,12 +110,23 @@ public class TestShoppingList {
 
     @Test
     public void testDelete() {
-        WebTarget target = provider.target().path("shoppinglists/45");
+        WebTarget target = provider.target().path("shoppinglists/1");
         assertNotNull(target);
 
         Response response = target.request(MediaType.APPLICATION_JSON).delete();
 
         assertThat(response.getStatus(), is(200));
+
+    }
+
+    @Test
+    public void testDeleteWithInvalidId() {
+        WebTarget target = provider.target().path("shoppinglists/1");
+        assertNotNull(target);
+
+        Response response = target.request(MediaType.APPLICATION_JSON).delete();
+
+        assertThat(response.getStatus(), is(204));
 
     }
 
