@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -43,13 +44,14 @@ public class ShoppingItemResource {
 
     @GET
     @Path("{id}")
+    @Produces({"application/json"})
     public ShoppingListItem find(@PathParam("id") long id) {
         return shoppingListItemManager.get(id);
     }
 
     @POST
     @Consumes("application/json")
-    public Response save(ShoppingListItem shoppingListItem, @Context UriInfo uriInfo) {
+    public Response save(@Valid  ShoppingListItem shoppingListItem, @Context UriInfo uriInfo) {
         shoppingListItem = shoppingListItemManager.save(shoppingListItem);
         URI uri = uriInfo.getAbsolutePathBuilder().path("/" + shoppingListItem.getId()).build();
         return Response.created(uri).entity(shoppingListItem).build();
@@ -57,7 +59,7 @@ public class ShoppingItemResource {
 
     @PUT
     @Path("{id}")
-    public ShoppingListItem update(@PathParam("id") long id, ShoppingListItem shoppingListItem) {
+    public ShoppingListItem update(@PathParam("id") long id, @Valid ShoppingListItem shoppingListItem) {
         shoppingListItem.setId(id);
         return shoppingListItemManager.save(shoppingListItem);
     }

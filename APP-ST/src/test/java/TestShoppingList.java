@@ -43,29 +43,11 @@ public class TestShoppingList {
 
     }
 
-
     @Test
-    public void testFindById() {
-        WebTarget target = provider.target().path("shoppinglists/1");
-        assertNotNull(target);
+    public void testCRUD() {
 
-        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        //CREATE
 
-        assertThat(response.getStatus(), is(200));
-
-        JsonObject payload = response.readEntity(JsonObject.class);
-
-        assertNotNull(payload);
-
-        assertThat(payload.getJsonNumber("id").longValue(), is(1L));
-        assertThat(payload.getString("description"), is("chocolate branco"));
-        assertThat(payload.getInt("quantity"), is(11));
-
-
-    }
-
-    @Test
-    public void testCreate() {
         WebTarget target = provider.target().path("shoppinglists");
         assertNotNull(target);
 
@@ -83,51 +65,91 @@ public class TestShoppingList {
 
         assertThat(payload.getJsonNumber("id").longValue(), is(1L));
 
-    }
+        //UPDATE
 
-    @Test
-    public void testUpdate() {
-        WebTarget target = provider.target().path("shoppinglists/1");
+        target = provider.target().path("shoppinglists/1");
         assertNotNull(target);
 
-        JsonObject sList = Json.createObjectBuilder()
+        sList = Json.createObjectBuilder()
                 .add("description", "chocolate branco")
                 .add("quantity", 11).build();
 
-        Response response = target.request(MediaType.APPLICATION_JSON).put(Entity.json(sList));
+        response = target.request(MediaType.APPLICATION_JSON).put(Entity.json(sList));
 
         assertThat(response.getStatus(), is(200));
 
-        JsonObject payload = response.readEntity(JsonObject.class);
+        payload = response.readEntity(JsonObject.class);
 
         assertNotNull(payload);
 
         assertThat(payload.getJsonNumber("id").longValue(), is(1L));
         assertThat(payload.getInt("quantity"), is(11));
         assertThat(payload.getString("description"), is("chocolate branco"));
-
-    }
-
-    @Test
-    public void testDelete() {
-        WebTarget target = provider.target().path("shoppinglists/1");
+        //FIND BY ID
+        target = provider.target().path("shoppinglists/1");
         assertNotNull(target);
 
-        Response response = target.request(MediaType.APPLICATION_JSON).delete();
+        response = target.request(MediaType.APPLICATION_JSON).get();
 
         assertThat(response.getStatus(), is(200));
 
-    }
+        payload = response.readEntity(JsonObject.class);
 
-    @Test
-    public void testDeleteWithInvalidId() {
-        WebTarget target = provider.target().path("shoppinglists/1");
+        assertNotNull(payload);
+
+        assertThat(payload.getJsonNumber("id").longValue(), is(1L));
+        assertThat(payload.getString("description"), is("chocolate branco"));
+        assertThat(payload.getInt("quantity"), is(11));
+
+
+        //REMOVE
+        target = provider.target().path("shoppinglists/1");
         assertNotNull(target);
 
-        Response response = target.request(MediaType.APPLICATION_JSON).delete();
+        response = target.request(MediaType.APPLICATION_JSON).delete();
+
+        assertThat(response.getStatus(), is(200));
+
+        //REMOVE INVALID ITEM
+        target = provider.target().path("shoppinglists/1");
+        assertNotNull(target);
+
+        response = target.request(MediaType.APPLICATION_JSON).delete();
 
         assertThat(response.getStatus(), is(204));
 
+    }
+
+    @Test
+    public void testWithInvalidDescription() {
+        WebTarget target = provider.target().path("shoppinglists");
+        assertNotNull(target);
+
+        JsonObject sList = Json.createObjectBuilder()
+                .addNull("description")
+                .add("quantity", 10).build();
+
+        Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.json(sList));
+
+        assertThat(response.getStatus(), is(400));
+        JsonObject payload = response.readEntity(JsonObject.class);
+        System.out.println(payload);
+    }
+
+    @Test
+    public void testWithInvalidQuantity() {
+        WebTarget target = provider.target().path("shoppinglists");
+        assertNotNull(target);
+
+        JsonObject sList = Json.createObjectBuilder()
+                .add("description","Bolachas")
+                .add("quantity", -1).build();
+
+        Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.json(sList));
+
+        assertThat(response.getStatus(), is(400));
+        JsonObject payload = response.readEntity(JsonObject.class);
+        System.out.println(payload);
     }
 
 
